@@ -1,3 +1,5 @@
 A simple dict. The query result is from youdao and baidu.
+It can translate English to Chinese and Chinese to English.
 
 一个简单的词典工具，查询结果来自有道和百度。
+可以进行英汉汉英的翻译。
