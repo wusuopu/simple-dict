@@ -216,8 +216,38 @@ class Dict(object):
         self.dicts = {
             "youdao" : Youdao(self.text_buffer),
             "baidu"  : Baidu(self.text_buffer)}
+        # 添加了 Ctrl + Alt + A的全局快捷键，可以显示/隐藏窗口
+        keymap = gtk.gdk.keymap_get_default()
+        keycode = keymap.get_entries_for_keyval(gtk.gdk.keyval_from_name('A'))
+        if keycode:
+            key = keycode[0][0]
+            from Xlib.display import Display
+            from Xlib import X
+            # current display
+            disp = Display()
+            root = disp.screen().root
+            root.grab_key(key, 12, 0, X.GrabModeAsync, X.GrabModeAsync)
+            root.grab_key(key, 14, 0, X.GrabModeAsync, X.GrabModeAsync)
+            root.grab_key(key, 28, 0, X.GrabModeAsync, X.GrabModeAsync)
+            root.grab_key(key, 30, 0, X.GrabModeAsync, X.GrabModeAsync)
+            root.grab_key(key, 140, 0, X.GrabModeAsync, X.GrabModeAsync)
+            root.grab_key(key, 142, 0, X.GrabModeAsync, X.GrabModeAsync)
+            root.grab_key(key, 156, 0, X.GrabModeAsync, X.GrabModeAsync)
+            root.grab_key(key, 158, 0, X.GrabModeAsync, X.GrabModeAsync)
+            t = threading.Thread(target=self.global_key_listen, args=(root, ))
+            t.setDaemon(True)
+            t.start()
+
         gtk.main()
 
+    def global_key_listen(self, root_win):
+        from Xlib import X
+        while 1:
+            event = root_win.display.next_event()
+            if event.type != X.KeyPress:
+                continue
+            self.tray_activate(None)
+    
     def search_word(self, button, entry):
         text = entry.get_text()
         if text.strip() == '':
